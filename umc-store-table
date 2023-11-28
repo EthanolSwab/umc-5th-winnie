@@ -1,0 +1,185 @@
+create table food_category
+(
+    id         bigint auto_increment
+        primary key,
+    name       varchar(15) null comment '음식종류',
+    created_at datetime(6) null comment '생성시각',
+    Column4    datetime(6) null
+)
+    comment '음식 종류';
+
+create table region
+(
+    id         bigint auto_increment comment '번호'
+        primary key,
+    name       varchar(20) null comment '지역 이름',
+    created_at datetime(6) null comment '생성시각',
+    updated_at datetime(6) null comment '갱신시각'
+)
+    comment '지역';
+
+create table store
+(
+    id         bigint auto_increment comment '번호'
+        primary key,
+    region_id  bigint      null comment '지역 번호',
+    name       varchar(50) null comment '상호명',
+    address    varchar(50) null comment '구체적주소',
+    score      float       null comment '점수',
+    created_at datetime(6) null comment '생성시각',
+    updated_at datetime(6) null comment '갱신시각',
+    constraint FK_store_region_id_region_id
+        foreign key (region_id) references region (id)
+)
+    comment '상호';
+
+create table terms
+(
+    id         bigint auto_increment comment '번호'
+        primary key,
+    title      varchar(20) null comment '제목',
+    body       text        null comment '내용',
+    optional   int         null comment '동의 여부',
+    created_at datetime(6) null comment '생성시각',
+    updated_at datetime(6) null comment '갱신시각'
+)
+    comment '동의 조항들';
+
+create table user
+(
+    id            bigint auto_increment comment '번호'
+        primary key,
+    name          varchar(20) null comment '이름',
+    gender        varchar(10) null comment '성별',
+    age           int         null comment '나이',
+    address       varchar(40) null comment '주소',
+    speec_address varchar(40) null comment '구체적주소',
+    status        varchar(15) null comment '상태',
+    inactive_date datetime    null comment '비활성 날짜',
+    social_type   varchar(10) null comment '소셜로그인 종류',
+    created_at    datetime(6) null comment '생성시각',
+    updated_at    datetime(6) null comment '갱신시각',
+    email         varchar(50) null comment '이메일',
+    point         int         null comment '누적포인트'
+)
+    comment '사용자 info';
+
+create table marketing_alarm
+(
+    id           bigint auto_increment comment '리뷰 번호'
+        primary key,
+    user_id      bigint      null comment '사용자 번호',
+    is_confirmed int         null comment '알람 확인 여부',
+    created_at   datetime(6) null comment '생성시각',
+    updated_at   datetime(6) null comment '갱신시각',
+    title        varchar(30) null comment '제목',
+    body         text        null comment '내용',
+    constraint FK_marketing_alarm_user_id_user_id
+        foreign key (user_id) references user (id)
+)
+    comment '광고알람';
+
+create table notice_alarm
+(
+    id           bigint auto_increment comment '번호'
+        primary key,
+    user_id      bigint      null comment '사용자 번호',
+    is_confirmed int         null comment '알람 확인 여부',
+    created_at   datetime(6) null comment '생성시각',
+    updated_at   datetime(6) null comment '갱신시각',
+    title        varchar(30) null comment '제목',
+    body         text        null comment '내용',
+    constraint FK_notice_alarm_user_id_user_id
+        foreign key (user_id) references user (id)
+)
+    comment '공지알람';
+
+create table mission
+(
+    id           bigint auto_increment comment '번호'
+        primary key,
+    store_id     bigint      null comment '상호 번호',
+    reward       int         null comment '보상',
+    deadline     datetime    null comment '마감기한',
+    mission_spec text        null comment '구체적 미션 내용',
+    created_at   datetime(6) null comment '생성시각',
+    updated_at   datetime(6) null comment '갱신시각',
+    constraint FK_mission_store_id_notice_alarm_id
+        foreign key (store_id) references notice_alarm (id)
+)
+    comment '미션내용';
+
+create table review
+(
+    id       bigint auto_increment comment '번호'
+        primary key,
+    user_id  bigint null comment '사용자 번호',
+    store_id bigint null comment '상호 번호',
+    body     text   null comment '내용',
+    score    float  null comment '점수',
+    constraint FK_review_store_id_store_id
+        foreign key (store_id) references store (id),
+    constraint FK_review_user_id_user_id
+        foreign key (user_id) references user (id)
+)
+    comment '리뷰';
+
+create table review_image
+(
+    id         bigint auto_increment comment '번호'
+        primary key,
+    review_id  bigint      null comment '리뷰 번호',
+    image_url  tinytext    null comment '이미지 url',
+    created_at datetime(6) null comment '생성시각',
+    updated_at datetime(6) null comment '갱신시각',
+    constraint FK_review_image_id_review_id
+        foreign key (id) references review (id)
+)
+    comment '리뷰 이미지';
+
+create table user_agreement
+(
+    id         bigint auto_increment comment '번호'
+        primary key,
+    user_id    bigint      null comment '사용자 번호',
+    terms_id   bigint      null comment '조항 번호',
+    created_at datetime(6) null comment '생성시각',
+    updated_at datetime(6) null comment '갱신시각',
+    constraint FK_user_agreement_id_user_id
+        foreign key (id) references user (id),
+    constraint FK_user_agreement_terms_id_terms_id
+        foreign key (terms_id) references terms (id)
+)
+    comment '사용자 이용동의서';
+
+create table user_mission
+(
+    id         bigint auto_increment comment '리뷰 번호'
+        primary key,
+    user_id    bigint      null comment '사용자 번호',
+    mission_id bigint      null comment '미션 번호',
+    status     varchar(15) null comment '진행 상태',
+    created_at datetime(6) null comment '생성시각',
+    updated_at datetime(6) null comment '갱신시각',
+    constraint FK_user_mission_mission_id_mission_id
+        foreign key (mission_id) references mission (id),
+    constraint FK_user_mission_user_id_user_id
+        foreign key (user_id) references user (id)
+)
+    comment '유저 미션';
+
+create table user_prefer
+(
+    id          bigint auto_increment comment '번호'
+        primary key,
+    user_id     bigint      null comment '사용자 번호',
+    category_id bigint      null comment '음식종류 번호',
+    created_at  datetime(6) null comment '생성시각',
+    updated_at  datetime(6) null comment '갱신시각',
+    constraint FK_user_prefer_category_id_food_category_id
+        foreign key (category_id) references food_category (id),
+    constraint FK_user_prefer_user_id_user_id
+        foreign key (user_id) references user (id)
+)
+    comment '사용자의 선호 음식 종류';
+
